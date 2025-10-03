@@ -19,8 +19,8 @@ services:
     build: .
     ports:
       - "8000:8000"
-    environment:
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/semantic_db
+    env_file:
+      - .env
     volumes:
       - ./backend:/code/backend
     depends_on:
