@@ -1,7 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from backend.api.routes import embeddings
-from backend.services.database import db_service
+from backend.api.routes import embeddings_routes
+from backend.services.database_service import db_service
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,7 +15,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title='Semantic Search', lifespan=lifespan)
 
 #Routers
-app.include_router(embeddings.router, prefix="/embeddings")
+app.include_router(embeddings_routes.router, prefix="/embeddings")
 
 #Health checks
 @app.get("/")

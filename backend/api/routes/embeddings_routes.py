@@ -1,8 +1,8 @@
 import uuid
 from fastapi import APIRouter, HTTPException
-from backend.models.document import DocumentUpload, SearchRequest
-from backend.services.database import db_service
-from backend.services.embeddings import embedding_service, chunk_text
+from backend.models.document_models import DocumentUpload, SearchRequest
+from backend.services.database_service import db_service
+from backend.services.embeddings_service import embedding_service, chunk_text
 
 router = APIRouter()
 
