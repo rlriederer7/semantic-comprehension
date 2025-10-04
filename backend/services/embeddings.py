@@ -1,27 +1,46 @@
 from sentence_transformers import SentenceTransformer
-import numpy as np
+from typing import List
 
-def doTheThing():
-    model = SentenceTransformer("all-MiniLM-L6-v2")
+class EmbeddingService:
+    def __init__(self):
+        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+        self.embedding_dimension = 384
 
-    sentences = [
-        "This is the first sentence",
-        "This is the second sentence",
-        "The History and Future of Humanity, written by Aroden",
-        "The fitnessgram pacer test is a multistage aerobic capacity test",
-        "The Gerald R. Ford-class nuclear-powered aircraft carriers are currently being constructed for the United States Navy",
-        "Yamato was the lead ship of her class of battleships built for the imperial Japanese Navy (IJN) shortly before World War II",
-        "It is cold outside",
-        "It is hot out",
-    ]
+    async def generate_embedding(self, text:str) -> List[float]:
+        try:
+            embedding = self.model.encode(text, convert_to_tensor=False)
+            return embedding.tolist()
+        except Exception as e:
+            print(f"Embedding error: {e}")
+            raise
 
-    print("encoding starting!!")
+    async def generate_embedding_batch(self, texts:List[str]) -> List[List[float]]:
+        try:
+            embeddings = self.model.encode(
+                texts,
+                convert_to_tensor=False,
+                batch_size = 32,
+                show_progress_bar = True
+            )
+            return [emb.tolist() for emb in embeddings]
+        except Exception as e:
+            print(f"Embedding error during batch embedding: {e}")
+            raise
 
-    embeddings = model.encode(sentences)
-    print(embeddings.shape)
+def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
+    words = text.split()
+    chunks = []
 
-    similarities = model.similarity(embeddings, embeddings)
-    print(similarities)
+    avg_word_length = len(text)/len(words) if words else 5
+    words_per_chunk = int(chunk_size // avg_word_length)
+    overlap_words = int(overlap // avg_word_length)
 
-if __name__ == "__main__":
-    doTheThing()
+    for i in range(0, len(words), words_per_chunk - overlap_words):
+        chunk = ' '.join(words[i:i + words_per_chunk])
+        if chunk:
+            chunks.append(chunk)
+
+    return chunks
+
+embedding_service = EmbeddingService()
+
