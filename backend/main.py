@@ -1,19 +1,21 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from backend.api.routes import embeddings
-from sentence_transformers import SentenceTransformer
+from backend.services.database import db_service
+from dotenv import load_dotenv
 
-#Grab model on startup to prevent 2-3 seconds hang time the first time a request is made
+load_dotenv()
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    app.state.embedding_model = SentenceTransformer('all-MiniLM-L6-v2')
+    await db_service.connect()
     yield
-    del app.state.embedding_model
+    await db_service.close()
 
 app = FastAPI(title='Semantic Search', lifespan=lifespan)
 
 #Routers
-app.include_router(embeddings.router, prefix="/backend/embeddings")
+app.include_router(embeddings.router, prefix="/embeddings")
 
 #Health checks
 @app.get("/")
