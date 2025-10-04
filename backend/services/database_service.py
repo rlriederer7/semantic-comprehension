@@ -5,7 +5,6 @@ from typing import List, Tuple
 class DatabaseService:
     def __init__(self):
         self.pool = None
-#        self.embedding_dimensions = 384 # really thought that would be useful
 
     async def connect(self):
         database_url = os.getenv("DATABASE_URL")

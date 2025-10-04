@@ -4,7 +4,7 @@ from typing import List
 class EmbeddingService:
     def __init__(self):
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
-        self.embedding_dimension = 384
+#        self.embedding_dimensions = 384 # really thought that would be useful
 
     async def generate_embedding(self, text:str) -> List[float]:
         try:
