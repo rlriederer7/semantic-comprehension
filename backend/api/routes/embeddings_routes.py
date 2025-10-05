@@ -35,7 +35,7 @@ async def upload_document(request: DocumentUpload):
         print(f"Error during upload: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/search_semantic_only", response_model = SearchResponse)
+@router.post("/search_semantic_only", response_model=SearchResponse)
 async def search_documents(request: SearchRequest):
     try:
         query_embedding = await embedding_service.generate_embedding(request.query)
@@ -50,7 +50,9 @@ async def search_documents(request: SearchRequest):
                 detail="No documents found in database"
             )
 
-        return similar_chunks
+        return SearchResponse(
+            chunks = similar_chunks
+        )
 
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
