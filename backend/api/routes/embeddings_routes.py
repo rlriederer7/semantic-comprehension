@@ -9,6 +9,7 @@ router = APIRouter()
 @router.post("/upload")
 async def upload_document(request: DocumentUpload):
     try:
+        await db_service.create_index()
         document_id = str(uuid.uuid4())
         chunks = chunk_text(request.text)
         if not chunks:

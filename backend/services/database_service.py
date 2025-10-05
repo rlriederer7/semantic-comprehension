@@ -9,7 +9,19 @@ class DatabaseService:
     async def connect(self):
         database_url = os.getenv("DATABASE_URL")
         self.pool = await asyncpg.create_pool(database_url, min_size=2, max_size=10)
+# For debugging/development only, drops index, document_chunks table, vectors on startup
+        await self.clear_on_startup()
         await self.init_db()
+
+    async def clear_on_startup(self):
+        async with self.pool.acquire() as conn:
+            print("dropping")
+            await conn.execute("""
+                DROP INDEX IF EXISTS embedding_idx;
+                DROP TABLE IF EXISTS document_chunks;
+                DROP EXTENSION IF EXISTS vector;
+            """)
+            print("dropped")
 
     async def init_db(self):
         async with self.pool.acquire() as conn:
@@ -26,13 +38,27 @@ class DatabaseService:
                 )
             """)
 
-            await conn.execute("""
-                CREATE INDEX IF NOT EXISTS embedding_idx
-                ON document_chunks
-                USING ivfflat (embedding vector_cosine_ops)
-                WITH (lists=100)
-            
-            """)
+    async def create_index(self):
+        async with self.pool.acquire() as conn:
+            count = await conn.fetchval("SELECT COUNT(*) FROM document_chunks")
+# indexes at 40 for debugging purposes, in reality it should wait to index at closer to 1k chunks, a point where
+# data retrieval starts being meaningfully slow. want to wait as long as possible so indexing is based off of
+# as much data as possible
+            if int(count) > 40:
+                print("checking for index")
+                index_exists = await conn.fetchval("""
+                    SELECT EXISTS (
+                        SELECT 1 FROM pg_indexes WHERE indexname = 'embedding_idx'
+                    )
+                """)
+                if not index_exists:
+                    print("indexing")
+                    await conn.execute("""
+                        CREATE INDEX IF NOT EXISTS embedding_idx
+                        ON document_chunks
+                        USING ivfflat (embedding vector_cosine_ops)
+                        WITH (lists=100)
+                    """)
 
     async def insert_chunk(self, document_id: str, chunk_index: int, text: str, embedding: List[float]) -> int:
         async with self.pool.acquire() as conn:
