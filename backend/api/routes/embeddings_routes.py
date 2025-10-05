@@ -37,11 +37,8 @@ async def upload_document(request: DocumentUpload):
 
 @router.post("/search_semantic_only", response_model = SearchResponse)
 async def search_documents(request: SearchRequest):
-    print(1)
     try:
-        print(2)
         query_embedding = await embedding_service.generate_embedding(request.query)
-        print(3)
         similar_chunks = await db_service.search_similar(
             query_embedding,
             limit=request.top_k
