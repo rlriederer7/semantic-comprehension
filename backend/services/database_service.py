@@ -63,8 +63,10 @@ class DatabaseService:
                     await conn.execute("""
                         CREATE INDEX IF NOT EXISTS embedding_idx
                         ON document_chunks
-                        USING ivfflat (embedding vector_cosine_ops)
-                        WITH (lists=100)
+--                        USING ivfflat (embedding vector_cosine_ops)
+                        USING hnsw (embedding vector_cosine_ops)
+--                        WITH (lists=100)
+                        WITH (m=16, ef_construction=64)
                     """)
 
     async def insert_chunk(self, document_id: str, document_name: str, chunk_index: int, text: str, embedding: List[float]) -> int:
