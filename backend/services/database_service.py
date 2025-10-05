@@ -48,7 +48,7 @@ class DatabaseService:
         async with self.pool.acquire() as conn:
             embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
             rows = await conn.fetch("""
-                SELECT text, embedding <-> $1 AS distance
+                SELECT text, embedding <=> $1 AS distance
                 FROM document_chunks
                 ORDER BY distance
                 LIMIT $2
