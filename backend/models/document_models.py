@@ -16,9 +16,19 @@ class DocumentUpload(BaseModel):
 
 class SearchRequest(BaseModel):
     query: str
-    provider: str = "openai" #does nothing for now
     top_k: int = 100
 
 class SearchResponse(BaseModel):
-    chunks: list[tuple[str, float]]
+    chunks: list[tuple[str, float, str]]
+
+class SearchLLMRequest(BaseModel):
+    query: str
+    provider: str = "openai" #does nothing for now
+    top_k: int = 10
+
+class SearchLLMResponse(BaseModel):
+    answer: str
+    chunks: list[tuple[str, float, str]]
+    provider_used: str
+
 
