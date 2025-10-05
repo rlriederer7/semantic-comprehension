@@ -10,7 +10,7 @@ class AnthropicProvider():
         if not api_key:
             raise ValueError("ANTHROPIC_API_KEY not found in environment")
         self.client = AsyncAnthropic(api_key=api_key)
-        self.model = "claude-sonnet-4-20250514"
+        self.model = os.getenv("ANTHROPIC_MODEL")
 
     async def generate(self, prompt: str, context_chunks: List[tuple[str, str]]) -> str:
         print(context_chunks)
