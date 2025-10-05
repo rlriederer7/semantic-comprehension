@@ -1,6 +1,6 @@
 import uuid
 from fastapi import APIRouter, HTTPException
-from backend.models.document_models import DocumentUpload, SearchRequest
+from backend.models.document_models import DocumentUpload, SearchRequest, SearchResponse
 from backend.services.database_service import db_service
 from backend.services.embeddings_service import embedding_service, chunk_text
 
@@ -35,7 +35,7 @@ async def upload_document(request: DocumentUpload):
         print(f"Error during upload: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
-@router.post("/search_semantic_only")
+@router.post("/search_semantic_only", response_model = SearchResponse)
 async def search_documents(request: SearchRequest):
     print(1)
     try:

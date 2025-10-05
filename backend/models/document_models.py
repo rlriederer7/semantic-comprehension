@@ -2,13 +2,13 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-class DocumentChunk(BaseModel):
-    id: Optional[int] = None
-    document_id: str
-    chunk_index: int
-    text: str
-    embedding: Optional[list[float]] = None
-    created: Optional[datetime] = None
+#class DocumentChunk(BaseModel):
+#    id: Optional[int] = None
+#    document_id: str
+#    chunk_index: int
+#    text: str
+#    embedding: Optional[list[float]] = None
+#    created: Optional[datetime] = None
 
 class DocumentUpload(BaseModel):
     text: str
