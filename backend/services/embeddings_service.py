@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer
 from typing import List
+import re
 
 class EmbeddingService:
     def __init__(self):
@@ -27,7 +28,19 @@ class EmbeddingService:
             print(f"Embedding error during batch embedding: {e}")
             raise
 
+def normalize_text(text: str) -> str:
+    text = text.replace('\r\n', '\n')  # Windows
+    text = text.replace('\r', '\n')     # Old Mac
+    text = text.replace('\t', ' ')
+    text = re.sub(r' +', ' ', text)
+    text = re.sub(r'\n\s*\n+', '\n\n', text)
+    text = text.strip()
+    
+    return text
+
+
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
+    text = normalize_text(text)
     words = text.split()
     chunks = []
 
