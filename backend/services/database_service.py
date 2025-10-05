@@ -10,7 +10,9 @@ class DatabaseService:
         database_url = os.getenv("DATABASE_URL")
         self.pool = await asyncpg.create_pool(database_url, min_size=2, max_size=10)
 # For debugging/development only, drops index, document_chunks table, vectors on startup
-        await self.clear_on_startup()
+        print(type(os.getenv("DEBUG")))
+        if os.getenv("DEBUG") == 'True':
+            await self.clear_on_startup()
         await self.init_db()
 
     async def clear_on_startup(self):
@@ -44,7 +46,11 @@ class DatabaseService:
 # indexes at 40 for debugging purposes, in reality it should wait to index at closer to 1k chunks, a point where
 # data retrieval starts being meaningfully slow. want to wait as long as possible so indexing is based off of
 # as much data as possible
-            if int(count) > 40:
+            if os.getenv("DEBUG") == 'True':
+                enough_chunks_to_index = 40
+            else:
+                enough_chunks_to_index = 1000
+            if int(count) > enough_chunks_to_index:
                 print("checking for index")
                 index_exists = await conn.fetchval("""
                     SELECT EXISTS (
