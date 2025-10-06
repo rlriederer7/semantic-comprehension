@@ -1,8 +1,5 @@
 import os
-from typing import List
-
 from anthropic import AsyncAnthropic
-
 
 class AnthropicProvider():
     def __init__(self):
@@ -12,10 +9,8 @@ class AnthropicProvider():
         self.client = AsyncAnthropic(api_key=api_key)
         self.model = os.getenv("ANTHROPIC_MODEL")
 
-    async def generate(self, prompt: str, context_chunks: List[tuple[str, str]]) -> str:
-        print(context_chunks)
+    async def generate(self, prompt: str, context_chunks: list[tuple[str, str]]) -> str:
         context = "\n\n---\n\n".join(f'Document Name: {src}\nText: "{text}"' for text, src in context_chunks)
-
         try:
             message = await self.client.messages.create(
                 model=self.model,

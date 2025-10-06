@@ -1,6 +1,5 @@
 import asyncpg
 import os
-from typing import List, Tuple
 
 class DatabaseService:
     def __init__(self):
@@ -69,7 +68,7 @@ class DatabaseService:
                         WITH (m=16, ef_construction=64)
                     """)
 
-    async def insert_chunk(self, document_id: str, document_name: str, chunk_index: int, text: str, embedding: List[float]) -> int:
+    async def insert_chunk(self, document_id: str, document_name: str, chunk_index: int, text: str, embedding: list[float]) -> int:
         async with self.pool.acquire() as conn:
             embedding_str = '[' + ','.join(map(str, embedding)) + ']'
             row = await conn.fetchrow("""
@@ -79,7 +78,7 @@ class DatabaseService:
             """, document_id, document_name, chunk_index, text, embedding_str)
             return row['id']
 
-    async def search_similar(self, query_embedding: List[float], limit: int = 10) -> List[Tuple[str, float, str]]:
+    async def search_similar(self, query_embedding: list[float], limit: int = 30) -> list[tuple[str, float, str]]:
         async with self.pool.acquire() as conn:
             embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
             rows = await conn.fetch("""

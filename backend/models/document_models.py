@@ -28,7 +28,7 @@ class SearchLLMRequest(BaseModel):
 
 class SearchLLMResponse(BaseModel):
     answer: str
-    chunks: list[tuple[str, float, str]]
+    chunks: list[tuple[str, str, float]]
     provider_used: str
 
 

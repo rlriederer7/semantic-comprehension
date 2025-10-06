@@ -1,5 +1,4 @@
 from sentence_transformers import SentenceTransformer
-from typing import List
 import re
 
 class EmbeddingService:
@@ -7,7 +6,7 @@ class EmbeddingService:
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 #        self.embedding_dimensions = 384 # really thought that would be useful
 
-    async def generate_embedding(self, text:str) -> List[float]:
+    async def generate_embedding(self, text:str) -> list[float]:
         try:
             embedding = self.model.encode(text, convert_to_tensor=False)
             return embedding.tolist()
@@ -15,7 +14,7 @@ class EmbeddingService:
             print(f"Embedding error: {e}")
             raise
 
-    async def generate_embedding_batch(self, texts:List[str]) -> List[List[float]]:
+    async def generate_embedding_batch(self, texts:list[str]) -> list[list[float]]:
         try:
             embeddings = self.model.encode(
                 texts,
@@ -39,7 +38,7 @@ def normalize_text(text: str) -> str:
     return text
 
 
-def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> List[str]:
+def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
     text = normalize_text(text)
     words = text.split()
     chunks = []

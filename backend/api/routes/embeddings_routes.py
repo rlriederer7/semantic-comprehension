@@ -1,8 +1,11 @@
+import os
 import uuid
 from fastapi import APIRouter, HTTPException
 from backend.models.document_models import DocumentUpload, SearchRequest, SearchResponse, SearchLLMRequest, SearchLLMResponse
 from backend.services.database_service import db_service
 from backend.services.llm_service import llm_service
+if os.getenv("RERANK_TOGGLE") == 'True':
+    from backend.services.reranker_service import reranker_service
 from backend.services.embeddings_service import embedding_service, chunk_text
 
 router = APIRouter()
@@ -66,9 +69,13 @@ async def search_documents(request: SearchRequest):
 async def search_documents_with_llm(request: SearchLLMRequest):
     try:
         query_embedding = await embedding_service.generate_embedding(request.query)
+        if os.getenv("RERANK_TOGGLE") == 'True':
+            reranker_multiplier = 4
+        else:
+            reranker_multiplier = 1
         similar_chunks = await db_service.search_similar(
             query_embedding,
-            limit=request.top_k
+            limit=request.top_k*reranker_multiplier
         )
 
         similar_truncated_chunks = []
@@ -82,13 +89,29 @@ async def search_documents_with_llm(request: SearchLLMRequest):
                 detail="No documents found in database"
             )
 
-        llm_answer = await llm_service.generate(request.query, similar_truncated_chunks)
+        if os.getenv("RERANK_TOGGLE") == 'True':
+            reranked_chunks = reranker_service.rerank_chunks(
+                request.query,
+                similar_truncated_chunks,
+                request.top_k
+            )
+
+            chunk_texts = [(text, doc_name) for text, doc_name, _ in reranked_chunks]
+            chunks_with_scores = reranked_chunks
+
+            llm_answer = await llm_service.generate(request.query, chunk_texts)
+        else:
+            llm_answer = await llm_service.generate(request.query, similar_truncated_chunks)
+            chunks_with_scores = [(text, doc_name, float(score)) for text, score, doc_name in similar_chunks]
         #llm_answer = "asdf"
+
         print(llm_answer)
+        print(chunks_with_scores)
+        print(request.provider)
 
         return SearchLLMResponse(
             answer=llm_answer,
-            chunks=similar_chunks,
+            chunks=chunks_with_scores,
             provider_used=request.provider
         )
 
