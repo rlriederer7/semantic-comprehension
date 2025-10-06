@@ -68,6 +68,7 @@ async def search_documents(request: SearchRequest):
 @router.post("/search_with_llm", response_model=SearchLLMResponse)
 async def search_documents_with_llm(request: SearchLLMRequest):
     try:
+        # If reranking, pull 4x as many chunks that might be relevant b/c reranking makes it cheap
         query_embedding = await embedding_service.generate_embedding(request.query)
         if os.getenv("RERANK_TOGGLE") == 'True':
             reranker_multiplier = 4
@@ -88,7 +89,7 @@ async def search_documents_with_llm(request: SearchLLMRequest):
                 status_code=404,
                 detail="No documents found in database"
             )
-
+        # If reranking, send rerankable information to the reranker, then to the LLM
         if os.getenv("RERANK_TOGGLE") == 'True':
             reranked_chunks = reranker_service.rerank_chunks(
                 request.query,
@@ -100,6 +101,7 @@ async def search_documents_with_llm(request: SearchLLMRequest):
             chunks_with_scores = reranked_chunks
 
             llm_answer = await llm_service.generate(request.query, chunk_texts)
+        # Otherwise, just send it to the LLm and then get it the order the response expects.
         else:
             llm_answer = await llm_service.generate(request.query, similar_truncated_chunks)
             chunks_with_scores = [(text, doc_name, float(score)) for text, score, doc_name in similar_chunks]
