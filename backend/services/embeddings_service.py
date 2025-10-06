@@ -37,7 +37,8 @@ def normalize_text(text: str) -> str:
     
     return text
 
-
+# Chunks are ideally equal sizes, but if words make that difficult, we chunk by words at the ends. "numb" and "numbers"
+# have very different meanings, despite being almost the same word.
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
     text = normalize_text(text)
     words = text.split()
@@ -46,7 +47,8 @@ def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]
     avg_word_length = len(text)/len(words) if words else 5
     words_per_chunk = int(chunk_size // avg_word_length)
     overlap_words = int(overlap // avg_word_length)
-
+    # So ultimately we guess how many words to a chunk based, and then add that many to a chunk.
+    # It does not matter if we are off by a little.
     for i in range(0, len(words), words_per_chunk - overlap_words):
         chunk = ' '.join(words[i:i + words_per_chunk])
         if chunk:

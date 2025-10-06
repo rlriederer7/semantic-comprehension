@@ -78,6 +78,8 @@ class DatabaseService:
             """, document_id, document_name, chunk_index, text, embedding_str)
             return row['id']
 
+    # Searches similarity by cosine similarity because we don't care if the query and the chunk are similar or different
+    # lengths, just their semantic orientation
     async def search_similar(self, query_embedding: list[float], limit: int = 30) -> list[tuple[str, float, str]]:
         async with self.pool.acquire() as conn:
             embedding_str = '[' + ','.join(map(str, query_embedding)) + ']'
