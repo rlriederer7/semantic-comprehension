@@ -1,10 +1,9 @@
 
 
-*
 .idea/
 
 __pycache__/
-*.py[cod]
+*.py[codz]
 *$py.class
 *.so
 .Python
