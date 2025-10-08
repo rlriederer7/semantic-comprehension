@@ -5,6 +5,7 @@ DEBUG mode means that Docker drops tables, vectors, and indeces on startup. Set 
 RERANK_TOGGLE makes startup take much longer, and in my experience has not been particularly worth the slowdown.
 
 DEBUG=True
+MAX_FILE_SIZE = 10485760
 
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=password
