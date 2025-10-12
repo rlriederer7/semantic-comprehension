@@ -118,7 +118,7 @@ function App() {
     setSearchResults(null);
 
     try {
-      const endpoint = useLLM ? '/embeddings/search_with_llm' : '/embeddings/search_semantic_only';
+      const endpoint = useLLM ? '/search/search_with_llm' : '/search/search_semantic_only';
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

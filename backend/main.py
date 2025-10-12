@@ -1,6 +1,7 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from backend.api.routes import search_routes
 from backend.api.routes import embeddings_routes
 from backend.services.database_service import db_service
 from dotenv import load_dotenv
@@ -25,6 +26,7 @@ app.add_middleware(
 
 #Routers
 app.include_router(embeddings_routes.router, prefix="/embeddings")
+app.include_router(search_routes.router, prefix="/search")
 
 #Health checks
 @app.get("/")
