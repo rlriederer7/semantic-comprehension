@@ -3,9 +3,9 @@ import uuid
 from fastapi import APIRouter, HTTPException, File, UploadFile, Form
 import PyPDF2
 import io
-from backend.models.document_models import DocumentUpload, SearchRequest, SearchResponse, SearchLLMRequest, SearchLLMResponse
-from backend.services.database_service import db_service
-from backend.services.embeddings_service import embedding_service, chunk_text
+from models.document_models import DocumentUpload, SearchRequest, SearchResponse, SearchLLMRequest, SearchLLMResponse
+from services.database_service import db_service
+from services.embeddings_service import embedding_service, chunk_text
 
 router = APIRouter()
 

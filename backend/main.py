@@ -1,9 +1,9 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from backend.api.routes import search_routes
-from backend.api.routes import embeddings_routes
-from backend.services.database_service import db_service
+from api.routes import search_routes
+from api.routes import embeddings_routes
+from services.database_service import db_service
 from dotenv import load_dotenv
 
 load_dotenv()
